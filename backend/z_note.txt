@@ -1,0 +1,16 @@
+validator (kiem tra email, url, Sdt,... )
+
+
+Thuộc tính "type": "module" trong file package.json cho phép Node.js xử lý mã JavaScript 
+của bạn theo chuẩn ECMAScript Module (ESM), thay vì CommonJS. Khi đặt "type": "module", 
+bạn có thể sử dụng cú pháp import và export của ES6 trực tiếp trong mã nguồn, thay vì 
+phải sử dụng require và module.exports của CommonJS.
+
+
+minimize: false trong mongoose.Schema có tác dụng ngăn Mongoose tự động xóa các trường rỗng 
+(empty object) trong tài liệu MongoDB.
+
+npm init
+npm i cors dotenv express jsonwebtoken mongoose multer nodemon validator cloudinary bcrypt
+
+npm install moment crypto-js axios

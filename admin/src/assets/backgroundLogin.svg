@@ -1,0 +1,4 @@
+<svg id="visual" viewBox="0 0 900 600" width="900" height="600" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
+    <rect x="0" y="0" width="900" height="600" fill="#11beef"></rect>
+    <path d="M0 401L37.5 424.2C75 447.3 150 493.7 225 473.5C300 453.3 375 366.7 450 320.8C525 275 600 270 675 299C750 328 825 391 862.5 422.5L900 454L900 601L862.5 601C825 601 750 601 675 601C600 601 525 601 450 601C375 601 300 601 225 601C150 601 75 601 37.5 601L0 601Z" fill="#172b4d" stroke-linecap="round" stroke-linejoin="miter"></path>
+</svg>
