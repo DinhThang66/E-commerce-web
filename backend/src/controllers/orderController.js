@@ -6,6 +6,7 @@ import axios from 'axios';
 import CryptoJS from 'crypto-js'
 import moment from 'moment';
 import qs from 'qs'
+import productModel from "../models/productModel.js";
 
 
 // Placing orders using (Cash on Delivery) COD MEthod
@@ -22,7 +23,15 @@ const placeOrder = async(req, res) => {
             payment: false,
             date: Date.now()
         }
-        console.log(orderData)
+        //console.log(orderData)
+        console.log("Item\n",items)
+        items.forEach(async (item) => {
+            const id = item._id
+            const quatity = item.quatity
+            const quantity = item.quantity
+            await productModel.findByIdAndUpdate(id, {quatity: quatity - quantity})
+
+        });
 
         const newOrder = await orderModel.create(orderData)
         await userModel.findByIdAndUpdate(userId, {cartData: {}})
@@ -67,7 +76,7 @@ const placeOrderZalopay = async(req, res) => {
         amount: amount,
         description: `Lazada - Payment for the order #${transID}`,
         bank_code: "",
-        callback_url: "https://f4b9-2402-800-62d0-1081-bd89-6139-333c-8ce1.ngrok-free.app/api/order/callback-zalopay", // thanh toán thành công thì gọi call back, dùng ngrok để public port
+        callback_url: "https://3281-2402-800-62d0-1081-8403-fbb4-6ddb-c6e0.ngrok-free.app/api/order/callback-zalopay", // thanh toán thành công thì gọi call back, dùng ngrok để public port
     };
     
     // appid|app_trans_id|appuser|amount|apptime|embeddata|item
@@ -106,7 +115,6 @@ const callbackZalopay = async(req, res) => {
             // thanh toán thành công
             // merchant cập nhật trạng thái cho đơn hàng
             let dataJson = JSON.parse(dataStr, config.key2);
-            console.log("dataJson", dataJson)
             console.log("update order's status = success where app_trans_id =", dataJson["app_trans_id"]);
             const userId = JSON.parse(dataJson.embed_data)?.userId
             const orderData = {

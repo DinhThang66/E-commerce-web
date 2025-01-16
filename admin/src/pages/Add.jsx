@@ -17,6 +17,8 @@ const Add = ({ token }) => {
     const [subCategory, setSubCategory] = useState('Topwear')
     const [bestseller, setBestseller] = useState(false)
     const [sizes, setSizes] = useState([])
+    const [quantity, setQuantity] = useState([])
+
     
     // useEffect(() => {
     //     console.log([name, description, price, category, subCategory, bestseller, sizes])
@@ -34,6 +36,8 @@ const Add = ({ token }) => {
             formData.append("subCategory", subCategory)
             formData.append("bestseller", bestseller)
             formData.append("sizes", JSON.stringify(sizes))
+            formData.append("quantity", quantity)
+
 
             image1 && formData.append("image1", image1)
             image2 && formData.append("image2", image2)
@@ -120,6 +124,12 @@ const Add = ({ token }) => {
                         className='w-full px-3 py-2 sm:w-[120px]'
                     />
                 </div>
+            </div>
+
+            <div className='w-full'>
+                <p className='mb-2'>Product quantity</p>
+                <input type="number" placeholder='25' onChange={(e) => setQuantity(e.target.value)} value={quantity}
+                        className='w-full px-3 py-2 sm:w-[120px]'/>
             </div>
 
             <div>
