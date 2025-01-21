@@ -6,6 +6,9 @@ const addProduct = async (req, res) => {
     try {
         const { name, description, price, category, subCategory, sizes, bestseller, quatity } = req.body
 
+        // Lấy thông tin người bán từ middleware
+        const sellerId = req.user.id;
+
         const image1 = req.files.image1 && req.files.image1[0]
         const image2 = req.files.image2 && req.files.image2[0]
         const image3 = req.files.image3 && req.files.image3[0]
@@ -29,6 +32,7 @@ const addProduct = async (req, res) => {
             image: imagesUrl,
             date: Date.now(),
             quatity: quatity,
+            sellerId
         }
 
         const newProduct = await productModel.create(productData)
@@ -76,6 +80,20 @@ const getAllProducts = async (req, res) => {
     }
 }
 
-export { addProduct, removeProduct, getProduct, getAllProducts};
+
+const adminGetAllProducts = async (req, res) => {
+    try {
+        // Lấy thông tin người bán từ middleware
+        const sellerId = req.user.id;
+
+        const products = await productModel.find({ sellerId })
+        res.json({ success: true, products: products })   
+    } catch (error) {
+        console.log(error)
+        res.json({ success: false, message: error.message })  
+    }
+}
+
+export { addProduct, removeProduct, getProduct, getAllProducts, adminGetAllProducts};
 
 

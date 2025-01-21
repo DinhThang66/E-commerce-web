@@ -34,7 +34,7 @@ const ShopContextProvider = (props) => {
             cartData[itemId][size] = 1
         }
         setCartItems(cartData)
-
+        console.log("cartData", cartData)
         // Api
         if (token) {
             try {

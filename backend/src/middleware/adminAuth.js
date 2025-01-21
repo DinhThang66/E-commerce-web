@@ -8,9 +8,16 @@ const adminAuth = async (req, res, next) => {
         }
 
         const token_decode = jwt.verify(token, process.env.JWT_SECRET)
-        if ( token_decode !== process.env.ADMIN_EMAIL + process.env.ADMIN_PASSWORD) {
+        if ( token_decode.role !== "admin") {
             return res.json({ success: false, message: "Not Authorized Login Again"})
         }
+        
+        // Gắn thông tin vào req để sử dụng ở middleware hoặc handler kế tiếp
+        req.user = {
+            id: token_decode.id, // Gắn id từ token
+            role: token_decode.role,
+        };
+
         next()
     } catch (error) {
         console.log(error)

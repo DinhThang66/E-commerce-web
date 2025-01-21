@@ -78,12 +78,39 @@ const adminLogin = async (req, res) => {
     try {
         const { email, password } = req.body
 
-        if( email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
-            const token = jwt.sign(email + password, process.env.JWT_SECRET)
-            return res.json({ success: true, token })    
-        } else {
-            return res.json({ success: false, message: "Invalid credentials" })    
-        }  
+        // Thêm phần này
+        const user = await userModel.findOne({email})
+        if(!user) {
+            return res.json({
+                success: false,
+                message: "User doesn't exists"
+            })
+        }
+
+        if(user.role !== "admin") {
+            return res.json({
+                success: false,
+                message: "No administrator rights"
+            })
+        }
+        const isMatch = await bcrypt.compare(password, user.password)
+        if (!isMatch) {
+            return res.json({
+                success: false,
+                message: "Invalid credentials",
+            });
+        }
+
+        const token = jwt.sign(
+            { id: user._id, role: user.role },
+            process.env.JWT_SECRET,
+            { expiresIn: "1d" } // Token hết hạn sau 1 ngày
+        );
+        
+        return res.json({
+            success: true,
+            token,
+        });
     } catch (error) {
         console.log(error)
         res.json({  success: false, message: error.message })  

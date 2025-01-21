@@ -14,27 +14,62 @@ const placeOrder = async(req, res) => {
     try {
         const { userId, items, amount, address} = req.body
 
-        const orderData = {
-            userId,
-            items, 
-            amount,
-            address,
-            paymentMethod: "COD",
-            payment: false,
-            date: Date.now()
+        // const orderData = {
+        //     userId,
+        //     items, 
+        //     amount,
+        //     address,
+        //     paymentMethod: "COD",
+        //     payment: false,
+        //     date: Date.now()
+        // }
+        // //console.log(orderData)
+        // console.log("Item\n",items)
+        // items.forEach(async (item) => {
+        //     const id = item._id
+        //     const quatity = item.quatity
+        //     const quantity = item.quantity
+        //     await productModel.findByIdAndUpdate(id, {quatity: quatity - quantity})
+
+        // });
+
+        // const newOrder = await orderModel.create(orderData)
+        // await userModel.findByIdAndUpdate(userId, {cartData: {}})
+
+        // Nhóm sản phẩm theo sellerId
+        const ordersBySeller = items.reduce((acc, item) => {
+            acc[item.sellerId] = acc[item.sellerId] || [];
+            acc[item.sellerId].push(item);
+            return acc;
+        }, {});
+        
+        // Tạo đơn hàng cho từng nhóm và xử lý số lượng sản phẩm
+        for (const [sellerId, sellerItems] of Object.entries(ordersBySeller)) {
+            const amount = sellerItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+            // Tạo đơn hàng
+            await orderModel.create({
+                userId,
+                items: sellerItems,
+                amount,
+                address,
+                paymentMethod: "COD",
+                payment: false,
+                date: Date.now(),
+            });
+
+            // Cập nhật số lượng sản phẩm
+            await Promise.all(
+                sellerItems.map(item =>
+                    productModel.findByIdAndUpdate(item._id, {
+                        $inc: { quatity: -item.quantity },
+                    })
+                )
+            );
         }
-        //console.log(orderData)
-        console.log("Item\n",items)
-        items.forEach(async (item) => {
-            const id = item._id
-            const quatity = item.quatity
-            const quantity = item.quantity
-            await productModel.findByIdAndUpdate(id, {quatity: quatity - quantity})
 
-        });
-
-        const newOrder = await orderModel.create(orderData)
-        await userModel.findByIdAndUpdate(userId, {cartData: {}})
+        // Xóa giỏ hàng
+        await userModel.findByIdAndUpdate(userId, { cartData: {} });
 
         res.json({ success: true, message: "Order Placed" })
     } catch (error) {
@@ -147,7 +182,18 @@ const callbackZalopay = async(req, res) => {
 // All Order data for Admin Panel
 const allOrders = async(req, res) => {
     try {
-        const orders = await orderModel.find({})
+        // Lấy thông tin người bán từ middleware
+        const sellerId = req.user.id;
+
+        // Tìm các đơn hàng chứa sản phẩm của admin hiện tại
+        const orders = await orderModel.find({
+            items: {
+                $elemMatch: { sellerId }, // Kiểm tra trong mảng items có sản phẩm nào thuộc sellerId này
+            },
+        });
+        
+
+        // const orders = await orderModel.find({})
         res.json({ success: true, orders })
         
     } catch (error) {
